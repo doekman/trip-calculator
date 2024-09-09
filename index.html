@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fuel App</title>
+    <style type="text/css">
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+        font-family: ui-rounded, "Hiragino Maru Gothic ProN", Quicksand,
+          Comfortaa, Manjari, Nunito, "Arial Rounded MT",
+          "Arial Rounded MT Bold", Calibri, source-sans-pro, sans-serif;
+        width: fit-content;
+      }
+      h1,
+      h2,
+      h3 {
+        line-height: 1.2;
+      }
+      header {
+        text-align: center;
+      }
+      label {
+        font-weight: bold;
+      }
+      p {
+        margin: 1em 0 0;
+      }
+      #app {
+        background: ghostwhite;
+        padding: 1em 1em 0.5em;
+        border-radius: 15px;
+      }
+      form {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 10px;
+      }
+      label {
+        grid-column: 1;
+        text-align: right;
+      }
+      input {
+        grid-column: 2;
+      }
+      .unit {
+        grid-column: 3;
+        font-size: smaller;
+      }
+      .total {
+        font-size: 24pt;
+        font-weight: 500;
+        text-align: right;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1 title="NoTemplate version">⛽<br />Fuel App*</h1>
+    </header>
+
+    <div id="app">
+      <noscript>JavaScript is required to use this calculator.</noscript>
+    </div>
+    <script src="notemplate.js"></script>
+    <script type="text/javascript">
+      const el = document.getElementById("app");
+      if (el) {
+        const timer = setTimeout(function () {
+          console.log("ran");
+          el.textContent = "Loading…";
+        }, 500);
+        el.dataset.timer = timer;
+      }
+
+      const data = {
+        price: 194.9,
+        economy: 7.4,
+        distance: 1050,
+      };
+
+      function calculate() {
+        return ((data.distance / 100.0) * data.economy * data.price) / 100.0;
+      }
+
+      function updateValue(target) {
+        const value = parseFloat(target.value);
+
+        if (!isNaN(value)) {
+          data[target.name] = value;
+        }
+        document.getElementById('total_value').innerHTML = calculate().toFixed(2)
+      }
+
+      const app = document.getElementById("app");
+      clearTimeout(parseInt(app.dataset.timer, 10));
+      app.replaceWith(renderForm())
+
+      function renderForm() {
+        const inputs = [
+          {id:'price',    label:'Price',       step:0.1, unit:'¢/l'},
+          {id:'economy',  label:'Consumption', step:0.1, unit:'l/100km'},
+          {id:'distance', label:'Distance',    step:1,   unit:'km'},
+        ]
+        return tag.div(
+          {id:'app'},
+          tag.form(
+            inputs.map(
+              item => [
+                tag.label({for:item.id}, item.label),
+                tag.input({
+                  change: function() { updateValue(this);},
+                  type:'number',
+                  step:item.step,
+                  name:item.id,
+                  id:item.id,
+                  size:'6',
+                  value: data[item.id]
+                }),
+                tag.span(
+                  tag.span({'class':'unit'}, item.unit)
+                )
+              ]
+            )
+          ),
+          tag.p({'class':'total'},
+            '$',
+            tag.span({id:'total_value'}, calculate().toFixed(2))
+          )
+        );
+      }
+    </script>
+  </body>
+</html>
